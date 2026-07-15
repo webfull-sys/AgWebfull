@@ -126,7 +126,7 @@
 			Ferramentas Suportadas
 		</h2>
 		<div class="tools-grid">
-			{#each tools.sort((a, b) => a.order - b.order) as tool}
+			{#each [...tools].sort((a, b) => a.order - b.order) as tool}
 				<div class="tool-chip">
 					<span class="tool-dot" style="background: {tool.accent};"></span>
 					<span class="tool-name">{tool.label}</span>

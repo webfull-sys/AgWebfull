@@ -27,7 +27,7 @@
 	<div class="tools-layout">
 		<!-- Grid de Tools -->
 		<div class="tools-grid">
-			{#each tools.sort((a, b) => a.order - b.order) as tool (tool.id)}
+			{#each [...tools].sort((a, b) => a.order - b.order) as tool (tool.id)}
 				{@const installs = getToolInstalls(tool.kebab)}
 				<button
 					class="tool-card"
