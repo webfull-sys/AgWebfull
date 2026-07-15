@@ -5,10 +5,18 @@
  * @author Webfull (https://webfull.com.br)
  */
 
-import { isBrowser, DESKTOP_ONLY_MESSAGE } from './platform';
+import { isBrowser, DESKTOP_ONLY_MESSAGE, isTauri } from './platform';
 import type { Agent, Tool, Division, InstallRecord, AppSettings, ActivityItem, Team, Project, ReconcileResult } from './types';
 import toolsData from './data/tools.json';
 import categoriesData from './data/categories.json';
+
+// ---------- Invoker do Tauri ----------
+
+/** Invoca um comando nativo em Rust (só carrega o pacote se estiver no desktop) */
+async function tauriInvoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+	const { invoke } = await import('@tauri-apps/api/core');
+	return invoke<T>(cmd, args);
+}
 
 // ---------- Constantes ----------
 const STORAGE_PREFIX = 'agwebfull_';
@@ -72,11 +80,14 @@ const SAMPLE_AGENTS: Agent[] = [
 
 /** Busca a lista de agentes do catálogo */
 export async function listAgents(): Promise<Agent[]> {
+	if (isTauri()) return tauriInvoke<Agent[]>('corpus_list');
 	return [...SAMPLE_AGENTS];
 }
 
 /** Busca um agente pelo slug */
 export async function getAgent(slug: string): Promise<Agent | null> {
+	if (isTauri()) return tauriInvoke<Agent>('corpus_get', { slug }).catch(() => null);
+
 	const agent = SAMPLE_AGENTS.find(a => a.slug === slug);
 	if (!agent) return null;
 	// Gera conteúdo markdown de exemplo se não tiver
@@ -124,6 +135,10 @@ You are a **${agent.title}** — a specialized AI agent persona from the Agency 
 
 /** Retorna a lista de ferramentas suportadas */
 export async function getTools(): Promise<Tool[]> {
+	if (isTauri()) {
+		return tauriInvoke<Tool[]>('tools_list');
+	}
+
 	const tools = toolsData.tools as Record<string, Omit<Tool, 'detected' | 'installedCount' | 'versionString'>>;
 	return Object.values(tools).map(t => ({
 		...t,
@@ -150,11 +165,27 @@ export async function getDivisions(): Promise<Division[]> {
 
 /** Retorna registros de instalação do localStorage */
 export async function getInstallRecords(): Promise<InstallRecord[]> {
+	// O backend já consolida as instalações no "installs_reconcile",
+	// Mas o original também possui installs_for_agent e tals. 
+	// Para não quebrar o layout, usaremos fallback
+	if (isTauri()) {
+		const recs = await tauriInvoke<any[]>('installs_reconcile', { projectRoots: [] });
+		return recs as InstallRecord[];
+	}
 	return storageGet<InstallRecord[]>(INSTALL_LEDGER_KEY, []);
 }
 
 /** Simula instalação de um agente (salva no localStorage + copia conteúdo) */
-export async function installAgent(agentSlug: string, toolId: string, scope: 'user' | 'project'): Promise<{ success: boolean; message: string; content?: string }> {
+export async function installAgent(agentSlug: string, toolId: string, scope: 'user' | 'project', projectPath?: string): Promise<{ success: boolean; message: string; content?: string }> {
+	if (isTauri()) {
+		try {
+			await tauriInvoke('install_agent', { slug: agentSlug, tool: toolId, projectPath: projectPath ?? null });
+			return { success: true, message: `✅ Agente instalado no ${toolId} via backend.` };
+		} catch (e: any) {
+			return { success: false, message: `Erro ao instalar: ${e.message || e}` };
+		}
+	}
+
 	const agent = await getAgent(agentSlug);
 	if (!agent) return { success: false, message: 'Agente não encontrado.' };
 
@@ -187,7 +218,16 @@ export async function installAgent(agentSlug: string, toolId: string, scope: 'us
 }
 
 /** Remove registro de instalação */
-export async function uninstallAgent(agentSlug: string, toolId: string, scope: 'user' | 'project'): Promise<boolean> {
+export async function uninstallAgent(agentSlug: string, toolId: string, scope: 'user' | 'project', projectPath?: string): Promise<boolean> {
+	if (isTauri()) {
+		try {
+			await tauriInvoke('uninstall_agent', { slug: agentSlug, tool: toolId, projectPath: projectPath ?? null });
+			return true;
+		} catch (e) {
+			console.error(e);
+			return false;
+		}
+	}
 	const records = await getInstallRecords();
 	const filtered = records.filter(r => !(r.agentSlug === agentSlug && r.toolId === toolId && r.scope === scope));
 	storageSet(INSTALL_LEDGER_KEY, filtered);
@@ -197,6 +237,17 @@ export async function uninstallAgent(agentSlug: string, toolId: string, scope: '
 
 /** Reconcilia estado de instalações (stub: retorna tudo como current) */
 export async function reconcile(): Promise<ReconcileResult> {
+	if (isTauri()) {
+		// O backend retorna InstalledAgent[], então a gente simula o resultado pro layout web
+		const installed = await tauriInvoke<any[]>('installs_reconcile', { projectRoots: [] });
+		return {
+			current: installed.length,
+			outdated: 0,
+			modified: 0,
+			removed: 0,
+			foreign: 0,
+		};
+	}
 	const records = await getInstallRecords();
 	return {
 		current: records.length,
@@ -221,11 +272,25 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 /** Carrega configurações do localStorage */
 export async function getSettings(): Promise<AppSettings> {
+	if (isTauri()) {
+		try {
+			return await tauriInvoke<AppSettings>('settings_get');
+		} catch (e) {
+			console.warn('Erro ao carregar configurações do Tauri, usando default', e);
+			return DEFAULT_SETTINGS;
+		}
+	}
 	return storageGet<AppSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
 }
 
 /** Salva configurações no localStorage */
 export async function saveSettings(settings: Partial<AppSettings>): Promise<AppSettings> {
+	if (isTauri()) {
+		// O backend pede objeto settings completo
+		const current = await getSettings();
+		const merged = { ...current, ...settings };
+		return tauriInvoke<AppSettings>('settings_set', { settings: merged });
+	}
 	const current = await getSettings();
 	const merged = { ...current, ...settings };
 	storageSet(SETTINGS_KEY, merged);
@@ -284,13 +349,21 @@ export async function deleteTeam(teamId: string): Promise<void> {
 
 /** Retorna projetos (stub: lista vazia na web) */
 export async function getProjects(): Promise<Project[]> {
+	if (isTauri()) {
+		return tauriInvoke<Project[]>('projects_list');
+	}
 	return storageGet<Project[]>(PROJECTS_KEY, []);
 }
 
 // ---------- Utilitários ----------
 
 /** Abre URL externa */
-export function openExternal(url: string): void {
+export async function openExternal(url: string): Promise<void> {
+	if (isTauri()) {
+		const { open } = await import('@tauri-apps/plugin-opener');
+		await open(url);
+		return;
+	}
 	if (isBrowser()) window.open(url, '_blank', 'noopener,noreferrer');
 }
 

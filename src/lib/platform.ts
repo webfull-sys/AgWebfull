@@ -5,9 +5,11 @@
  * @author Webfull (https://webfull.com.br)
  */
 
-/** Verifica se estamos rodando dentro do Tauri (sempre false na versão web) */
+/** Verifica se estamos rodando dentro do Tauri */
 export function isTauri(): boolean {
-	return false;
+	if (!isBrowser()) return false;
+	// @ts-ignore
+	return window.__TAURI_INTERNALS__ !== undefined;
 }
 
 /** Verifica se estamos no navegador (vs SSR) */
@@ -20,12 +22,12 @@ export type Platform = 'web' | 'desktop';
 
 /** Retorna a plataforma atual */
 export function getPlatform(): Platform {
-	return 'web';
+	return isTauri() ? 'desktop' : 'web';
 }
 
 /** Verifica se um recurso desktop está disponível */
 export function isDesktopFeatureAvailable(): boolean {
-	return false;
+	return isTauri();
 }
 
 /** Mensagem padrão para recursos desktop indisponíveis */
