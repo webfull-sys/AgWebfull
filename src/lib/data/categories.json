@@ -1,0 +1,17 @@
+{
+  "_note": "Metadados de divisões/categorias do catálogo de agentes. Baseado no agency-agents-app (MIT).",
+  "categories": {
+    "academic": { "label": "Academic", "icon": "GraduationCap", "color": "#8B5CF6" },
+    "design": { "label": "Design", "icon": "PenTool", "color": "#EC4899" },
+    "engineering": { "label": "Engineering", "icon": "Code", "color": "#3B82F6" },
+    "finance": { "label": "Finance", "icon": "DollarSign", "color": "#22C55E" },
+    "game-development": { "label": "Game Development", "icon": "Gamepad2", "color": "#F97316" },
+    "legal": { "label": "Legal", "icon": "Scale", "color": "#6B7280" },
+    "management": { "label": "Management", "icon": "Users", "color": "#14B8A6" },
+    "marketing": { "label": "Marketing", "icon": "Megaphone", "color": "#F43F5E" },
+    "operations": { "label": "Operations", "icon": "Settings", "color": "#8B5CF6" },
+    "product": { "label": "Product", "icon": "Package", "color": "#06B6D4" },
+    "research": { "label": "Research", "icon": "Search", "color": "#A855F7" },
+    "strategy": { "label": "Strategy", "icon": "Target", "color": "#EAB308" }
+  }
+}

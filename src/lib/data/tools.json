@@ -1,0 +1,17 @@
+{
+  "_note": "Registry de ferramentas suportadas — baseado no agency-agents-app (MIT) por Michael Sitarzewski. Adaptado para AgWebfull web.",
+  "tools": {
+    "claude-code": {"id":"claudeCode","label":"Claude Code","short":"Claude","kebab":"claude-code","accent":"#D97757","icon":"claudecode","order":1,"scope":{"user":true,"project":true},"format":"identity","installKind":"per-agent"},
+    "codex": {"id":"codex","label":"Codex","short":"Codex","kebab":"codex","accent":"#10A37F","icon":"codex","order":2,"scope":{"user":true,"project":true},"format":"codex-agents","installKind":"per-agent"},
+    "cursor": {"id":"cursor","label":"Cursor","short":"Cursor","kebab":"cursor","accent":"#5B5FC7","icon":"cursor","order":3,"scope":{"user":true,"project":true},"format":"identity","installKind":"per-agent"},
+    "gemini-cli": {"id":"geminiCli","label":"Gemini CLI","short":"Gemini","kebab":"gemini-cli","accent":"#4285F4","icon":"geminicli","order":4,"scope":{"user":true,"project":true},"format":"gemini-agents","installKind":"per-agent"},
+    "github-copilot": {"id":"githubCopilot","label":"GitHub Copilot","short":"Copilot","kebab":"github-copilot","accent":"#6e40c9","icon":"copilot","order":5,"scope":{"user":false,"project":true},"format":"copilot-instructions","installKind":"roster"},
+    "qwen": {"id":"qwen","label":"Qwen","short":"Qwen","kebab":"qwen","accent":"#615EFF","icon":"qwen","order":6,"scope":{"user":true,"project":true},"format":"identity","installKind":"per-agent"},
+    "opencode": {"id":"opencode","label":"opencode","short":"opencode","kebab":"opencode","accent":"#00D4AA","icon":"opencode","order":7,"scope":{"user":true,"project":true},"format":"opencode-agents","installKind":"per-agent"},
+    "osaurus": {"id":"osaurus","label":"Osaurus","short":"Osaurus","kebab":"osaurus","accent":"#FF6B35","icon":"osaurus","order":8,"scope":{"user":true,"project":true},"format":"identity","installKind":"per-agent"},
+    "windsurf": {"id":"windsurf","label":"Windsurf","short":"Windsurf","kebab":"windsurf","accent":"#00C4B4","icon":"windsurf","order":9,"scope":{"user":false,"project":true},"format":"windsurf-rules","installKind":"roster"},
+    "aider": {"id":"aider","label":"Aider","short":"Aider","kebab":"aider","accent":"#00B4D8","icon":"aider","order":10,"scope":{"user":true,"project":true},"format":"aider-conventions","installKind":"roster"},
+    "cline": {"id":"cline","label":"Cline","short":"Cline","kebab":"cline","accent":"#FF4081","icon":"cline","order":11,"scope":{"user":false,"project":true},"format":"identity","installKind":"per-agent"},
+    "roo-code": {"id":"rooCode","label":"Roo Code","short":"Roo","kebab":"roo-code","accent":"#7C3AED","icon":"roocode","order":12,"scope":{"user":false,"project":true},"format":"roo-modes","installKind":"per-agent"}
+  }
+}
