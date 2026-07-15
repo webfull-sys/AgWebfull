@@ -18,8 +18,9 @@ RUN npm run build
 FROM node:20-alpine AS runtime
 WORKDIR /app
 
-# Segurança: criar user não-root
-RUN addgroup -g 1001 -S nodejs && \
+# Instalar wget para healthcheck + criar user não-root
+RUN apk add --no-cache wget && \
+    addgroup -g 1001 -S nodejs && \
     adduser -S agwebfull -u 1001
 
 # Copiar apenas o build e dependências de produção
@@ -44,8 +45,8 @@ EXPOSE 3000
 # Usar user não-root
 USER agwebfull
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+# Health check (start-period de 30s para dar tempo ao Node iniciar)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD wget -qO- http://localhost:3000/ || exit 1
 
 # Iniciar app (adapter-node gera o handler)
