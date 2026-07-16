@@ -1,19 +1,19 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Agency Agents",
+  "productName": "AgWebfull",
   "version": "0.3.0",
-  "identifier": "com.zerologic.agency-agents-app",
+  "identifier": "com.webfull.agwebfull",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1430",
+    "devUrl": "http://localhost:5173",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../build"
+    "frontendDist": "../.svelte-kit/output/client"
   },
   "app": {
     "withGlobalTauri": false,
     "windows": [
       {
-        "title": "Agency Agents",
+        "title": "AgWebfull",
         "width": 1100,
         "height": 720,
         "minWidth": 800,
@@ -23,40 +23,27 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://api.github.com https://github.com https://codeload.github.com https://objects.githubusercontent.com https://raw.githubusercontent.com https://agencyagents.app; img-src 'self' data: https://raw.githubusercontent.com https://avatars.githubusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
-    }
-  },
-  "plugins": {
-    "updater": {
-      "endpoints": [
-        "https://agencyagents.app/updater.json"
-      ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFCRjVBRkQ4ODhFRDI5QkQKUldTOUtlMkkySy8xcTlyRnNjM1pkMy9sc2NkMzdOOVlhTEd5OTVoNFIwWDI4VUROUGhVbFNuMzMK"
+      "csp": "default-src 'self'; connect-src 'self' https://api.github.com https://github.com https://codeload.github.com https://objects.githubusercontent.com https://raw.githubusercontent.com; img-src 'self' data: https://raw.githubusercontent.com https://avatars.githubusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
     }
   },
   "bundle": {
     "active": true,
-    "createUpdaterArtifacts": true,
-    "targets": "all",
+    "createUpdaterArtifacts": false,
+    "targets": ["msi", "nsis"],
     "resources": [
-      "resources/corpus-baseline/**/*",
-      "Assets.car"
+      "resources/corpus-baseline/**/*"
     ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "macOS": {
-      "signingIdentity": "Developer ID Application: Michael Sitarzewski (7JQGQ7CRH8)",
-      "hardenedRuntime": true,
-      "minimumSystemVersion": "13.0",
-      "dmg": {
-        "windowSize": { "width": 540, "height": 380 },
-        "appPosition": { "x": 140, "y": 190 },
-        "applicationFolderPosition": { "x": 400, "y": 190 }
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "certificateThumbprint": null,
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
       }
     }
   }
