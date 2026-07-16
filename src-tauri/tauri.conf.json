@@ -7,7 +7,7 @@
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:5173",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../.svelte-kit/output/client"
+    "frontendDist": "../build"
   },
   "app": {
     "withGlobalTauri": false,
@@ -24,6 +24,12 @@
     ],
     "security": {
       "csp": "default-src 'self'; connect-src 'self' https://api.github.com https://github.com https://codeload.github.com https://objects.githubusercontent.com https://raw.githubusercontent.com; img-src 'self' data: https://raw.githubusercontent.com https://avatars.githubusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFCRjVBRkQ4ODhFRDI5QkQKUldTOUtlMkkySy8xcTlyRnNjM1pkMy9sc2NkMzdOOVlhTEd5OTVoNFIwWDI4VUROUGhVbFNuMzMK"
     }
   },
   "bundle": {
